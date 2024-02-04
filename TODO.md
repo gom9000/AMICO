@@ -3,7 +3,7 @@ This file contains the todo list of **AMICO** project.
 
 
 ## Next Tasks
-- [ ] Draw memory mapper table
+- [x] Draw memory mapper table
 - [ ] Draw control bus signals and time diagrams
 - [ ] Draw architecture diagram
 - [ ] Draw mcu basic instruction set
