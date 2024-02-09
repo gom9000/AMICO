@@ -9,7 +9,7 @@ This is a home project for a simple 8-bit microcomputer, based on a "virtual CPU
 - 8-bit Data BUS
 - 16-bit Address BUS
 - Memory mapped I/O
-- Programmable bus clock divider signal (BCLK/n)
+- time based or signal based operation
 
 
 ## Architecture
@@ -30,7 +30,10 @@ This is a home project for a simple 8-bit microcomputer, based on a "virtual CPU
     * /WAIT - wait for slow device operation. "Lo" value puts the CPU into IDLE mode until line come back "Hi".
     * /RESET - system reset. "Lo" value causes a system reset.
     * BCLK - bus clock. Reference clock for the bus operations.
-    * BCLK/n - programmable clock divider. Available and programmable by any devices.
+* Auxiliary lines:
+    * AUX0 or BCLK/n - auxiliary line 0 or programmable clock (BCLK divided by n). Available and programmable by any device.
+    * AUX1 - auxiliary line 1. Available for custom usage by any device.
+    * AUX2 - auxiliary line 2. Available for custom usage by any device.
 
 
 ### Address Map
@@ -41,7 +44,7 @@ The memory and registers of the I/O devices are mapped on the same address space
 | C000H - FFFFH | 16KB | USER ROM (banks 0,1 for 8KB each) 
 | A000H - BFFFH |  8KB | SYSTEM ROM           
 | 8000H - 9FFFH |  8KB | I/O (devices 0..7 for 1KB each)   
-| 0000H - 7FFFH | 32KB | RAM (banks 0..3 for KB each)     
+| 0000H - 7FFFH | 32KB | RAM (banks 0..3 for 8KB each)     
 
 
 ### Read/Write Operations
@@ -149,6 +152,7 @@ CPU READ                                      _
 D0-D7         -------------------------------<_>---
 
 ```
+
 
 ### The CPU
 CPU implementation:
