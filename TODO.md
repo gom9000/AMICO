@@ -5,17 +5,20 @@ This file contains the todo list of **AMICO** project.
 ## Next Tasks
 - [x] Draw memory mapper table
 - [x] Draw control bus signals and timing diagrams
-- [ ] Draw architecture diagram
+- [x] Draw architecture diagram
+- [x] Draw address decoder logics
 - [ ] Draw mcu basic instruction set
-- [ ] Draw clock module logic
 - [ ] Draw backplane diagram
-- [ ] Draw address decoder logics
+- [x] Draw RAM card logic
+- [ ] Draw ROM card logic
+- [ ] Draw I/O card logic
+- [ ] Draw clock module/divisor logic
 
 
 ## Future Tasks
 
 ### 1.0.0 "*mercury*" xxxx-xx-xx Feature release
 - [ ] Draw hardware schematics and pcb layouts
-- [ ] Realize and shot release images
+- [ ] Realize backplane and cards
 - [ ] Write system software code
 - [ ] Write some user software codes

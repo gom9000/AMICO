@@ -1,7 +1,7 @@
 # AMICO - Another Micro 8-bit Computer
 This is a home project for a simple 8-bit microcomputer, based on a "virtual CPU" implemented by a programmed microcontroller (as a PIC or similar).
 
-![amico-mercury.jpg](images/amico-mercury.jpg)
+![amico-mercury.jpg](amico-mercury.jpg)
 
 
 
@@ -13,7 +13,7 @@ This is a home project for a simple 8-bit microcomputer, based on a "virtual CPU
 
 
 ## Architecture
-![amico-architecture.jpg](images/amico-architecture.jpg)
+![amico-architecture.jpg](amico-architecture.jpg)
 
 ### BUS
 
@@ -37,7 +37,7 @@ This is a home project for a simple 8-bit microcomputer, based on a "virtual CPU
 
 
 ### Address Map
-The memory and registers of the I/O devices are mapped on the same address space (memory mapped I/O), so a memory address may refer to either a portion of physical RAM/ROM or to registers of the I/O device. The 64KB of accessible addresses are divided by 8 blocks of 8KB each. The address map of the AMICO system looks like this:
+The memory and registers of the I/O devices are mapped on the same address space (memory mapped I/O), so a memory address may refer to either a portion of physical RAM/ROM or to registers of the I/O device. The 64KB of accessible addresses are logically divided by 8 blocks of 8KB each. The address map of the AMICO system looks like this:
 
 | Addresses     | Size | Assignment           
 |---------------|------|----------------------
@@ -45,6 +45,17 @@ The memory and registers of the I/O devices are mapped on the same address space
 | A000H - BFFFH |  8KB | SYSTEM ROM           
 | 8000H - 9FFFH |  8KB | I/O (devices 0..7 for 1KB each)   
 | 0000H - 7FFFH | 32KB | RAM (banks 0..3 for 8KB each)     
+
+
+### Address MAP Decoder
+#### RAM Address Decoder
+The address line A15=LOW selects all the 32KB RAM space, then no gate ports are needed.
+
+#### ROM Address Decoder
+The 8KB of system ROM can be accessed with the address lines A15=HIGH and A14=LOW. Then two gates (NAND) are needed to implements the logic, or a single demux (138 or 139).
+
+#### I/O Address Decoder
+To access to the 8 x 1KB I/O space, a demux (138) is needed, with address lines A13, A14, A15 selcting I/O devices 1 through 8, and the upper address lines set as: A13=A14=LOW and A15=HIGH.
 
 
 ### Read/Write Operations
@@ -125,7 +136,7 @@ CPU SET       ____________                     ____
 
 ```
 
-#### Read Operation
+#### Slow Device I/O Read Operation
 1. CPU writes and latches Address on BUS
 2. CPU sets Control Line */READ*
 3. DEVICE sets Control Line */WAIT*
@@ -159,6 +170,15 @@ CPU implementation:
 - The CPU instructions used to access the memory are the same used for accessing I/O devices.
 - BUS content remains the same until next change.
 - WAIT signal bypass the instruction cycle with NOP execution.
+
+
+
+## Hardware
+
+### Backplane
+
+### Cards
+* [32KB SRAM](cards/sram-32KB)
 
 
 

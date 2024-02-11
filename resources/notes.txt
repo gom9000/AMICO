@@ -1,0 +1,269 @@
+- decidere se inserire address decoder su scheda bus, oppure su ogni card (passive vs active backplane vs motherboard);
+- decidere se la decisione precedente riguarda solo indirizzi di memoria o anche I/O, e quindi se creare un apposito bus di I/O;
+- address decoding:
+	- qualificazione segnali RD/WR/EN
+	- numero porte logiche tra bus e chips
+- circuito di reset;
+- circuito di clock;
+- divisore programmabile BCLK/n;
+
+- interrupt management ???;
+- DMA management ???;
+
+- I/O Devices:
+	sono collegati al BUS tramite i "peripheral interface devices" (se address decoder non è su scheda bus)
+	- keyboard
+	- 6-digit display
+	- LCD display
+	- Graphic Display
+	- RS232
+	- Parallel Port
+	- SID ??? (forse è collegato direttamente sul bus)
+	- MIDI interface
+	- USER Interface
+
+- programma monitor:
+	in ROM ci sono 4 programmi principali in sequenza:
+		POST:test routines, inits the chipset, checks RAM, set interrupt vector index, set BIOS stack area, load BIOS data area;
+		CMOS Setup: scrive le configurazioni;
+		Bootstrap Loader: loads the OS from <source> to RAM;
+		BIOS: provides sw routines to interface to system hw, executed in response to hw or sw interrupts
+		
+	- modalità di inserimento ed esecuzione programmi assembly (tipo kim-1);
+	- richiamo programmi in ROM;
+	- dopo reset call verso locazione xxx per verificare presenza cartrige (16KB?) che sostituisce la ROM interna? (vedere come funziona)
+	- una sorta di BIOS
+- applicazioni:
+	- Interprete BASIC;
+	- Applicazioni audio;
+	- tic-tac-toe;
+	- SIDxpander MIDI;
+
+- instruction set: read <address>, write <addr>, add <data>, sub <data>
+			inc <register>
+			dec <register>
+			jmp <label>
+			label <label>
+			test <register>
+			end
+			ld <register>, <register> | <value>
+			in <address>
+			out <address>
+			add
+			sub
+		load reg, value|reg, store reg
+
+keyboard:
+    - tebo-8bit-input-switch			todo 2xtebo
+  data-input: 8bit
+  function-keys: 8bit
+	(command-mode)
+	f1: prev program
+	f2: next program
+	f3: run
+	f4: edit
+	f5: remove
+        f6: -
+        f7: soft reset
+	(edit-mode)
+	f1: prev line
+	f2: next line
+	f3: store line
+        f4: -
+	f5: remove line
+	f6: exit mode
+	f7: soft reset
+	(run-mode)
+	f6: exit mode
+	f7: soft reset
+
+SOFTWARE:
+--------
+il divider va programmato per OSC/n di periodo 1/2s;
+
+; busy_clock.pgm
+
+DECLARE
+
+CONST	OSC_ADDR	EQU	00H
+CONST	SW_ADDR		EQU	01H
+CONST	HH1_ADDR	EQU	02H
+CONST	HH2_ADDR	EQU	03H
+CONST	MI1_ADDR	EQU	04H
+CONST	MI2_ADDR	EQU	05H
+CONST	SS1_ADDR	EQU	06H
+CONST	SS2_ADDR	EQU	07H
+CONST	SW_HH_PLUS	EQU	1
+CONST	SW_HH_MINUS	EQU	2
+CONST	SW_MI_PLUS	EQU	3
+CONST	SW_MI_MINUS	EQU	4
+
+register hh1 1
+register hh2 1
+register mi1 1
+register mi2 1
+register ss1 1
+register ss2 1
+register sw  1
+
+
+	START
+
+LABEL	mainloop
+	INPUT 	SW_ADDR, sw
+	BITTEST	SW, SW_HH_PLUS
+	GOTO	sw_hh_plus
+	BITTEST	SW, SW_HH_MINUS
+	GOTO	sw_hh_minus
+	BITTEST	SW, SW_MI_PLUS
+	GOTO	sw_mi_plus
+	BITTEST	SW, SW_MI_MINUS
+	GOTO	sw_mi_minus
+
+LABEL	sw_hh_plus
+	INC	hh1
+	TEST	hh1, 25
+	SET	hh1, 0
+	GOTO	display
+
+LABEL	sw_hh_minus
+LABEL	sw_mi_plus
+LABEL	sw_mi_minus
+
+
+LABEL	display
+	
+
+	SLEEP	995			; 1 secondo meno il tempo impiegato dalle istruzioni sopra...
+
+	GOTO	mainloop
+
+	END
+
+
+
+
+A Mini OS for xpSimpleC computer.
+
+
+sos-monitor
+sos-interpreter
+
+
+SOS
+--------
+- ROM interna al pic;
+- Kernel con funzioni di monitoring (tipo configurare in/out e osc, editare un programma, caricare un programma in memoria, eseguirlo, stopparlo, ...);
+- Registers "statici" interni al pic;
+- programma editato dalla in-port (echoed sulla out-port) istruzione per istruzione.
+- integrare il codice da eseguire in un xpTask dello xpScheduler per cui è configurabile la frequenza di esecuzione dei task;
+- 
+
+
+
+#io-echo.aas
+define IN_DEVICE_ADDR 	01H
+define OUT_DEVICE_ADDR 	02H
+
+begin
+
+000H	mov     ACC, 00H
+001H	write	OUT_DEVICE_ADDR
+002H	read	IN_DEVICE_ADDR
+003H	write	OUT_DEVICE_ADDR
+004H	jump	0002H
+
+end
+
+
+#io-echo.ao
+000H	A00000
+001H	A102
+002H	0201
+003H	A102
+004H	03002
+
+
+
+
+accumulator opcodes
+ACC	00H
+ACC1	01H
+ACC2	02H
+ACC3	03H
+ACC4	04H
+
+instruction opcodes
+nop	A0H
+mov	A1H
+write	A2H
+read	A3H
+jump	A4H
+add
+
+
+
+
+3/4-byte for instruction:
+#line-number	#instruction	#address	[#data]
+
+
+; -----------------------------------------------------------
+; busy_clock.pgm
+
+DECLARE
+
+CONST	OSC_ADDR	EQU	00H
+CONST	SW_ADDR		EQU	01H
+CONST	HH1_ADDR	EQU	02H
+CONST	HH2_ADDR	EQU	03H
+CONST	MI1_ADDR	EQU	04H
+CONST	MI2_ADDR	EQU	05H
+CONST	SS1_ADDR	EQU	06H
+CONST	SS2_ADDR	EQU	07H
+CONST	SW_HH_PLUS	EQU	1
+CONST	SW_HH_MINUS	EQU	2
+CONST	SW_MI_PLUS	EQU	3
+CONST	SW_MI_MINUS	EQU	4
+
+register hh1 1
+register hh2 1
+register mi1 1
+register mi2 1
+register ss1 1
+register ss2 1
+register sw  1
+
+
+	START
+
+LABEL	mainloop
+	INPUT 	SW_ADDR, sw
+	BITTEST	SW, SW_HH_PLUS
+	GOTO	sw_hh_plus
+	BITTEST	SW, SW_HH_MINUS
+	GOTO	sw_hh_minus
+	BITTEST	SW, SW_MI_PLUS
+	GOTO	sw_mi_plus
+	BITTEST	SW, SW_MI_MINUS
+	GOTO	sw_mi_minus
+
+LABEL	sw_hh_plus
+	INC	hh1
+	TEST	hh1, 25
+	SET	hh1, 0
+	GOTO	display
+
+LABEL	sw_hh_minus
+LABEL	sw_mi_plus
+LABEL	sw_mi_minus
+
+
+LABEL	display
+	
+
+	SLEEP	995			; 1 secondo meno il tempo impiegato dalle istruzioni sopra...
+
+	GOTO	mainloop
+
+	END
