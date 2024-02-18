@@ -37,7 +37,8 @@ This is a home project for a simple 8-bit microcomputer, based on a "virtual CPU
 
 
 ### Address Map
-The memory and registers of the I/O devices are mapped on the same address space (memory mapped I/O), so a memory address may refer to either a portion of physical RAM/ROM or to registers of the I/O device. The 64KB of accessible addresses are logically divided by 8 blocks of 8KB each. The address map of the AMICO system looks like this:
+The memory and registers of the I/O devices are mapped on the same address space (memory mapped I/O), so a memory address may refer to either a portion of physical RAM/ROM or to registers of the I/O device.
+The 64KB of accessible addresses are logically divided by 8 blocks of 8KB each. The address map of the AMICO system looks like this:
 
 | Addresses     | Size | Assignment           
 |---------------|------|----------------------
@@ -47,19 +48,22 @@ The memory and registers of the I/O devices are mapped on the same address space
 | 0000H - 7FFFH | 32KB | RAM (banks 0..3 for 8KB each)     
 
 
-### Address MAP Decoder
+### Address MAP Decoders
+The placement of address space assignments is designed to minimize the number of gate ports needed to decode addresses.
+
 #### RAM Address Decoder
 The address line A15=LOW selects all the 32KB RAM space, then no gate ports are needed.
 
 #### ROM Address Decoder
-The 8KB of system ROM can be accessed with the address lines A15=HIGH and A14=LOW. Then two gates (NAND) are needed to implements the logic, or a single demux (138 or 139).
+The 24KB of ROM space can be accessed, via a single 2-to-4 demux (138 or 139) with address lines A15=HIGH and A14, A13 selecting bank 0 through 2
 
 #### I/O Address Decoder
-To access to the 8 x 1KB I/O space, a demux (138) is needed, with address lines A13, A14, A15 selcting I/O devices 1 through 8, and the upper address lines set as: A13=A14=LOW and A15=HIGH.
+To access to the 8x1KB I/O space, a single 3-to-8 demux (138) is needed, with address lines A10, A11, A12 selecting I/O devices 0 through 7, and the upper address lines set as: A13=A14=LOW and A15=HIGH.
 
 
 ### Read/Write Operations
-Fast enought Read/Write operations (inside a bus clock period) are time based sequences of command, generated from the CPU to the target device. The CPU sets the address and/or data lines on the rising edge of the bus clock signal, and reads/holds the data on/until the next rising edge.
+Fast enought Read/Write operations (inside a bus clock period) are time based sequences of command, generated from the CPU to the target device.
+The CPU sets the address and/or data lines on the rising edge of the bus clock signal, and reads/holds the data on/until the next rising edge.
 
 Via the *WAIT/* control line, slow devices can perform operations in signal-based mode manner.
 
@@ -178,7 +182,7 @@ CPU implementation:
 ### Backplane
 
 ### Cards
-* [32KB SRAM](cards/sram-32KB)
+* [RAM - 32KB SRAM](cards/sram-32KB)
 
 
 
